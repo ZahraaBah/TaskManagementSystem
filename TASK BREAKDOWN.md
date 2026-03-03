@@ -2,24 +2,25 @@
 
 ## Phase 1 – Setup
 
-* [X ] Initialize backend project
-* [X ] Configure TypeScript
-* [ X] Setup Express
-* [ ] Setup PostgreSQL
-* [X ] Setup Drizzle
-* [ ] Setup frontend (Vite + Tailwind)
-* [ ] Setup testing frameworks
+- [x] Initialize backend project
+- [x] Configure TypeScript
+- [x] Setup Express
+- [x] Setup PostgreSQL
+- [x] Setup Drizzle
+- [ ] Setup frontend (Vite + Tailwind)
+- [ ] Setup testing frameworks
 
 ---
 
 ## Phase 2 – Database
 
-* [ ] Define users table
-* [ ] Define tasks table
-* [ ] Add foreign key
-* [ ] Generate migration
-* [ ] Apply migration
-* [ ] Verify schema
+- [x] Define users table
+- [x] Define tasks table
+- [x] Add foreign key
+- [x] Generate migration
+- [x] Apply migration
+- [x] Verify schema
+
 
 ---
 
