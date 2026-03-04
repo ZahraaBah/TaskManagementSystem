@@ -5,7 +5,7 @@
 - [x] Initialize backend project
 - [x] Configure TypeScript
 - [x] Setup Express
-- [x] Setup PostgreSQL
+- [x-Chiva] Setup PostgreSQL
 - [x] Setup Drizzle
 - [ ] Setup frontend (Vite + Tailwind)
 - [ ] Setup testing frameworks
@@ -14,12 +14,12 @@
 
 ## Phase 2 – Database
 
-- [x] Define users table
-- [x] Define tasks table
-- [x] Add foreign key
-- [x] Generate migration
-- [x] Apply migration
-- [x] Verify schema
+- [x-Chiva] Define users table
+- [x-Chiva] Define tasks table
+- [x-Chiva] Add foreign key
+- [x-Chiva] Generate migration
+- [x-Chiva] Apply migration
+- [x-Chiva] Verify schema
 
 
 ---
