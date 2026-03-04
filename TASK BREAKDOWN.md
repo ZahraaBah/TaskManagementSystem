@@ -42,9 +42,9 @@
 
 * [ ] Create task
 * [ ] List tasks (user scoped)
-* [ ] Update task (ownership check)
+*** [ ] Update task (ownership check)
 * [ ] Delete task (ownership check)
-* [ ] Filtering
+*** [ ] Filtering
 * [ ] Unit tests for task service
 * [ ] Integration tests for task routes
 * [ ] Add docstrings
