@@ -2,11 +2,11 @@
 
 ## Phase 1 – Setup
 
-- [x] Initialize backend project
-- [x] Configure TypeScript
-- [x] Setup Express
+- [x] Initialize backend project -ZAHRA
+- [x] Configure TypeScript -ZAHRA
+- [x] Setup Express - ZAHRA
 - [x] Setup PostgreSQL
-- [x] Setup Drizzle
+- [x] Setup Drizzle - ZAHRA
 - [ ] Setup frontend (Vite + Tailwind)
 - [ ] Setup testing frameworks
 
@@ -14,7 +14,7 @@
 
 ## Phase 2 – Database
 
-- [x] Define users table
+- [x] Define users table 
 - [x] Define tasks table
 - [x] Add foreign key
 - [x] Generate migration
@@ -26,15 +26,15 @@
 
 ## Phase 3 – Authentication
 
-* [ ] Register endpoint
-* [ ] Hash password
-* [ ] Login endpoint
-* [ ] JWT generation
-* [ ] Auth middleware
+* [ x] Register endpoint - ZAHRA 
+* [ x] Hash password - ZAHRA
+* [ x] Login endpoint - ZAHRA
+* [ x] JWT generation - ZAHRA
+* [ x] Auth middleware - ZAHRA
 * [ ] Protect task routes
-* [ ] Unit tests for auth service
-* [ ] Integration tests for auth routes
-* [ ] Add docstrings
+* [ x] Unit tests for auth service - ZAHRA
+* [ x] Integration tests for auth routes - ZAHRA
+* [ x] Add docstrings - ZAHRA
 
 ---
 
