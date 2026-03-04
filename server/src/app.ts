@@ -1,8 +1,8 @@
 import express from 'express';
 import authRouter from './modules/auth/auth.routes';
+import tasksRouter from './modules/tasks/tasks.routes';
 
 const app = express();
-
 app.use(express.json());
 
 // Health check
@@ -12,8 +12,6 @@ app.get('/health', (_req, res) => {
 
 // Routes
 app.use('/auth', authRouter);
-
-// Tasks router will be mounted here in Phase 4
-// app.use('/tasks', tasksRouter);
+app.use('/tasks', tasksRouter);
 
 export default app;
