@@ -5,8 +5,8 @@
 - [x] Initialize backend project -ZAHRA
 - [x] Configure TypeScript -ZAHRA
 - [x] Setup Express - ZAHRA
-- [x] Setup PostgreSQL
 - [x] Setup Drizzle - ZAHRA
+- [x-Chiva] Setup PostgreSQL
 - [ ] Setup frontend (Vite + Tailwind)
 - [ ] Setup testing frameworks
 
@@ -14,12 +14,12 @@
 
 ## Phase 2 – Database
 
-- [x] Define users table 
-- [x] Define tasks table
-- [x] Add foreign key
-- [x] Generate migration
-- [x] Apply migration
-- [x] Verify schema
+- [x-Chiva] Define users table
+- [x-Chiva] Define tasks table
+- [x-Chiva] Add foreign key
+- [x-Chiva] Generate migration
+- [x-Chiva] Apply migration
+- [x-Chiva] Verify schema
 
 
 ---
@@ -42,9 +42,9 @@
 
 * [ ] Create task
 * [ ] List tasks (user scoped)
-* [ ] Update task (ownership check)
+*** [ ] Update task (ownership check)
 * [ ] Delete task (ownership check)
-* [ ] Filtering
+*** [ ] Filtering
 * [ ] Unit tests for task service
 * [ ] Integration tests for task routes
 * [ ] Add docstrings
