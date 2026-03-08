@@ -199,13 +199,20 @@ Frontend runs on `http://localhost:5173`
 ---
 
 ## Running Tests
+
+### Backend
 ```bash
 cd server
 npm run test
 ```
-
 38 tests across 4 test files (unit + integration).
 
+### Frontend
+```bash
+cd client
+npx vitest run
+```
+6 tests across 2 test files (component tests).
 ---
 
 ## API Endpoints
