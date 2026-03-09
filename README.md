@@ -21,18 +21,27 @@ Users can register, log in, and manage their own tasks. Each user can only acces
 - **bcrypt** — Password hashing
 - **JWT** — Authentication tokens
 - **Vitest + Supertest** — Unit and integration tests
+- **Docker + Docker Compose** — Containerized development environment
+
+### Frontend
+- **React** — UI framework
+- **Vite** — Build tool
+- **TypeScript** — Type-safe codebase
+- **Tailwind CSS** — Utility-first styling
 
 ---
 
 ## Folder Structure
-
 ```
-task-manager/
+TaskManagementSystem/
 ├── README.md
-├── PROJECT_DESIGN.md
-├── TASK_BREAKDOWN.md
+├── PROJECT DESIGN.md
+├── TASK BREAKDOWN.md
+├── docker-compose.yml
+├── client/                     # React frontend (Vite + Tailwind)
 └── server/
-    ├── drizzle.config.ts       # Drizzle ORM configuration
+    ├── Dockerfile
+    ├── drizzle.config.ts
     ├── package.json
     ├── tsconfig.json
     ├── .env.example
@@ -58,7 +67,9 @@ task-manager/
                 ├── tasks.repository.ts
                 ├── tasks.routes.ts
                 ├── tasks.schema.ts
-                └── tasks.dto.ts
+                ├── tasks.dto.ts
+                ├── tasks.service.test.ts
+                └── tasks.routes.test.ts
 ```
 
 ---
@@ -79,23 +90,39 @@ No database calls are made in controllers. No business logic lives in repositori
 
 ## Setup Instructions
 
-### Prerequisites
-- Node.js v18+
-- PostgreSQL v14+
+### Option A — Docker (Recommended)
 
-### 1. Clone the repository
+#### Prerequisites
+- Docker Desktop
+```bash
+git clone https://github.com/ZahraaBah/TaskManagementSystem.git
+cd TaskManagementSystem
+docker compose up --build
+```
+
+Server runs on `http://localhost:3000`
+
+---
+
+### Option B — Local Setup
+
+#### Prerequisites
+- Node.js v18+
+- PostgreSQL v16+
+
+#### 1. Clone the repository
 ```bash
 git clone https://github.com/ZahraaBah/TaskManagementSystem.git
 cd TaskManagementSystem
 ```
 
-### 2. Install backend dependencies
+#### 2. Install backend dependencies
 ```bash
 cd server
 npm install
 ```
 
-### 3. Configure environment variables
+#### 3. Configure environment variables
 ```bash
 cp .env.example .env
 ```
@@ -112,7 +139,7 @@ Generate a secure JWT secret:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-### 4. Create the database
+#### 4. Create the database
 ```bash
 psql -U postgres
 CREATE DATABASE taskmanager;
@@ -133,10 +160,15 @@ CREATE DATABASE taskmanager;
 
 ## Migration Commands
 
-Push schema directly to database:
+Generate migration files:
 ```bash
 cd server
-npx drizzle-kit push --config=drizzle.config.ts
+npm run db:generate
+```
+
+Apply migrations:
+```bash
+npm run db:migrate
 ```
 
 ---
@@ -155,12 +187,24 @@ Health check: `GET http://localhost:3000/health`
 
 ---
 
-## Running Tests
+## Running the Frontend
+```bash
+cd client
+npm install
+npm run dev
+```
 
+Frontend runs on `http://localhost:5173`
+
+---
+
+## Running Tests
 ```bash
 cd server
 npm run test
 ```
+
+38 tests across 4 test files (unit + integration).
 
 ---
 
@@ -173,6 +217,16 @@ npm run test
 | POST | `/auth/register` | No | Register a new user | 201 |
 | POST | `/auth/login` | No | Login and receive JWT | 200 |
 
+### Tasks
+
+| Method | Endpoint | Auth | Description | Success |
+|---|---|---|---|---|
+| GET | `/tasks` | Yes | Get all user tasks | 200 |
+| GET | `/tasks?completed=true` | Yes | Filter by status | 200 |
+| POST | `/tasks` | Yes | Create a new task | 201 |
+| PATCH | `/tasks/:id` | Yes | Update a task | 200 |
+| DELETE | `/tasks/:id` | Yes | Delete a task | 200 |
+
 ### HTTP Status Codes
 
 | Code | Meaning |
@@ -181,6 +235,8 @@ npm run test
 | 201 | Created |
 | 400 | Validation error |
 | 401 | Not authenticated |
+| 403 | Forbidden (not owner) |
+| 404 | Not found |
 | 409 | Conflict (e.g. email already exists) |
 | 500 | Internal server error |
 
@@ -195,11 +251,17 @@ Authorization: Bearer <token>
 
 ## DTOs
 
-All API requests and responses conform to typed DTOs defined in `auth.dto.ts`:
-
+### Auth (`auth.dto.ts`)
 - `RegisterRequestDto` — Register payload
 - `LoginRequestDto` — Login payload
 - `AuthResponseDto` — Token + user on success
 - `UserResponseDto` — Safe user object (no password)
+- `ErrorResponseDto` — Standard error response
+- `ValidationErrorDto` — Zod validation errors
+
+### Tasks (`tasks.dto.ts`)
+- `CreateTaskRequestDto` — Create task payload
+- `UpdateTaskRequestDto` — Update task payload
+- `TaskResponseDto` — Full task object in responses
 - `ErrorResponseDto` — Standard error response
 - `ValidationErrorDto` — Zod validation errors

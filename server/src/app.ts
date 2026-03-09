@@ -1,7 +1,14 @@
 import express from 'express';
+import cors from 'cors';
 import authRouter from './modules/auth/auth.routes';
 
 const app = express();
+
+// Allow requests from the frontend dev server
+app.use(cors({
+  origin: process.env.CLIENT_URL ?? 'http://localhost:5173',
+  credentials: true,
+}));
 
 app.use(express.json());
 
@@ -13,7 +20,6 @@ app.get('/health', (_req, res) => {
 // Routes
 app.use('/auth', authRouter);
 
-// Tasks router will be mounted here in Phase 4
-// app.use('/tasks', tasksRouter);
+// app.use('/tasks', tasksRouter); // Phase 4
 
 export default app;

@@ -1,0 +1,29 @@
+services:
+  task-manager-postgres:
+    image: postgres:16-alpine
+    container_name: taskmanager_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: taskmanager
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  server:
+    build:
+      context: ./server
+    container_name: taskmanager_server
+    depends_on:
+      - task-manager-postgres
+    env_file:
+      - ./server/.env
+    environment:
+      DATABASE_URL: postgresql://postgres:1234@task-manager-postgres:5432/taskmanager
+      PORT: 3000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
