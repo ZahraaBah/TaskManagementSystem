@@ -225,7 +225,7 @@ npm run test
 | GET | `/tasks?completed=true` | Yes | Filter by status | 200 |
 | POST | `/tasks` | Yes | Create a new task | 201 |
 | PATCH | `/tasks/:id` | Yes | Update a task | 200 |
-| DELETE | `/tasks/:id` | Yes | Delete a task | 200 |
+| DELETE | `/tasks/:id` | Yes | Delete a task | 204 |
 
 ### HTTP Status Codes
 

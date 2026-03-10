@@ -7,7 +7,7 @@
 - [x] Setup Express - ZAHRA
 - [x] Setup PostgreSQL - Chiva
 - [x] Setup Drizzle - ZAHRA
-- [ ] Setup frontend (Vite + Tailwind) -Chiva
+- [x] Setup frontend (Vite + Tailwind) -Chiva
 - [ ] Setup testing frameworks -Chiva
 
 ---
@@ -26,37 +26,37 @@
 
 ## Phase 3 – Authentication
 
-* [ x] Register endpoint - ZAHRA 
-* [ x] Hash password - ZAHRA
-* [ x] Login endpoint - ZAHRA
-* [ x] JWT generation - ZAHRA
-* [ x] Auth middleware - ZAHRA
+* [x] Register endpoint - ZAHRA 
+* [x] Hash password - ZAHRA
+* [x] Login endpoint - ZAHRA
+* [x] JWT generation - ZAHRA
+* [x] Auth middleware - ZAHRA
 * [ ] Protect task routes
-* [ x] Unit tests for auth service - ZAHRA
-* [ x] Integration tests for auth routes - ZAHRA
-* [ x] Add docstrings - ZAHRA
+* [x] Unit tests for auth service - ZAHRA
+* [x] Integration tests for auth routes - ZAHRA
+* [x] Add docstrings - ZAHRA
 
 ---
 
 ## Phase 4 – Task Module
 
-* [ ] Create task -Chiva
-* [ ] List tasks (user scoped) -Chiva
-* [ ] Update task (ownership check) -Chiva
-* [ ] Delete task (ownership check) -Chiva
-* [ ] Filtering -Chiva
-* [ ] Unit tests for task service -Chiva
-* [ ] Integration tests for task routes -Chiva
-* [ ] Add docstrings -Chiva
+* [x] Create task -Chiva
+* [x] List tasks (user scoped) -Chiva
+* [x] Update task (ownership check) -Chiva
+* [x] Delete task (ownership check) -Chiva
+* [x] Filtering -Chiva
+* [x] Unit tests for task service -Chiva
+* [x] Integration tests for task routes -Chiva
+* [x] Add docstrings -Chiva
 
 ---
 
 ## Phase 5 – Frontend
 
-* [ ] Register page
-* [ ] Login page
-* [ ] Store JWT
-* [ ] Protected routes
+* [x] Register page -ZAHRA
+* [x] Login page -ZAHRA
+* [x] Store JWT -ZAHRA
+* [x] Protected routes -ZAHRA
 * [ ] Task list page
 * [ ] Create task form
 * [ ] Toggle complete
