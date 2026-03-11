@@ -85,9 +85,7 @@ export const register = async (
  * @returns AuthResponseDto containing JWT token and user data
  * @throws Error if credentials are invalid
  */
-export const login = async (
-  input: LoginInput
-): Promise<AuthResponseDto> => {
+export const login = async (input: LoginInput): Promise<AuthResponseDto> => {
   const [user] = await db
     .select()
     .from(users)

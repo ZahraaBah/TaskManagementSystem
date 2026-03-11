@@ -123,7 +123,9 @@ describe('POST /tasks', () => {
 
 describe('PATCH /tasks/:id', () => {
   it('should return 401 without token', async () => {
-    const res = await request.patch(`/tasks/${taskId}`).send({ title: 'Updated' });
+    const res = await request
+      .patch(`/tasks/${taskId}`)
+      .send({ title: 'Updated' });
     expect(res.status).toBe(401);
   });
 

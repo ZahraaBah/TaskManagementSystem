@@ -1,5 +1,9 @@
 import * as tasksRepository from './tasks.repository';
-import type { CreateTaskInput, UpdateTaskInput, FilterTaskInput } from './tasks.schema';
+import type {
+  CreateTaskInput,
+  UpdateTaskInput,
+  FilterTaskInput,
+} from './tasks.schema';
 import type { TaskResponseDto } from './tasks.dto';
 
 /**
@@ -38,7 +42,10 @@ export const getTasksByUser = async (
   userId: string,
   filter: FilterTaskInput
 ): Promise<TaskResponseDto[]> => {
-  const tasks = await tasksRepository.findTasksByUserId(userId, filter.completed);
+  const tasks = await tasksRepository.findTasksByUserId(
+    userId,
+    filter.completed
+  );
   return tasks.map(toTaskResponse);
 };
 

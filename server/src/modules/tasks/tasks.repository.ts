@@ -84,9 +84,6 @@ export const updateTask = async (
  * @returns Deleted Task record or undefined if not found
  */
 export const deleteTask = async (id: string): Promise<Task | undefined> => {
-  const [task] = await db
-    .delete(tasks)
-    .where(eq(tasks.id, id))
-    .returning();
+  const [task] = await db.delete(tasks).where(eq(tasks.id, id)).returning();
   return task;
 };

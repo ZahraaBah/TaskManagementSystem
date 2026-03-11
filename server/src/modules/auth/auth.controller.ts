@@ -24,7 +24,7 @@ export const registerController = async (
   try {
     const result = await authService.register(parsed.data);
     res.status(201).json(result);
-} catch (error) {
+  } catch (error) {
     console.error('Register error:', error);
     if (error instanceof Error && error.message === 'Email already in use') {
       res.status(409).json({ message: error.message });
