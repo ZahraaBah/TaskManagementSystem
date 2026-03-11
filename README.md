@@ -304,13 +304,13 @@ npm run format:check
 
 ### Tasks
 
-| Method | Endpoint                | Auth | Description        | Success |
-| ------ | ----------------------- | ---- | ------------------ | ------- |
-| GET    | `/tasks`                | Yes  | Get all user tasks | 200     |
-| GET    | `/tasks?completed=true` | Yes  | Filter by status   | 200     |
-| POST   | `/tasks`                | Yes  | Create a new task  | 201     |
-| PATCH  | `/tasks/:id`            | Yes  | Update a task      | 200     |
-| DELETE | `/tasks/:id`            | Yes  | Delete a task      | 200     |
+| Method | Endpoint | Auth | Description | Success |
+|---|---|---|---|---|
+| GET | `/tasks` | Yes | Get all user tasks | 200 |
+| GET | `/tasks?completed=true` | Yes | Filter by status | 200 |
+| POST | `/tasks` | Yes | Create a new task | 201 |
+| PATCH | `/tasks/:id` | Yes | Update a task | 200 |
+| DELETE | `/tasks/:id` | Yes | Delete a task | 200 |
 
 ### HTTP Status Codes
 
