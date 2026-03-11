@@ -10,8 +10,15 @@ vi.mock('./tasks.repository', () => ({
 }));
 
 import * as tasksRepository from './tasks.repository';
-import { getTasksByUser, createTask, updateTask, deleteTask } from './tasks.service';
+import {
+  getTasksByUser,
+  createTask,
+  updateTask,
+  deleteTask,
+} from './tasks.service';
 
+// Simple fix - just disable the eslint warning for this line
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockRepo = tasksRepository as any;
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
@@ -61,7 +68,10 @@ describe('getTasksByUser', () => {
 
     const result = await getTasksByUser('user-uuid-123', { completed: true });
 
-    expect(mockRepo.findTasksByUserId).toHaveBeenCalledWith('user-uuid-123', true);
+    expect(mockRepo.findTasksByUserId).toHaveBeenCalledWith(
+      'user-uuid-123',
+      true
+    );
     expect(result).toHaveLength(0);
   });
 });
@@ -70,15 +80,25 @@ describe('getTasksByUser', () => {
 describe('updateTask', () => {
   it('should update task if user owns it', async () => {
     mockRepo.findTaskById.mockResolvedValueOnce(mockTask);
-    mockRepo.updateTask.mockResolvedValueOnce({ ...mockTask, title: 'Updated' });
+    mockRepo.updateTask.mockResolvedValueOnce({
+      ...mockTask,
+      title: 'Updated',
+    });
 
-    const result = await updateTask('task-uuid-123', { title: 'Updated' }, 'user-uuid-123');
+    const result = await updateTask(
+      'task-uuid-123',
+      { title: 'Updated' },
+      'user-uuid-123'
+    );
 
     expect(result.title).toBe('Updated');
   });
 
   it('should throw Forbidden if user does not own the task', async () => {
-    mockRepo.findTaskById.mockResolvedValueOnce({ ...mockTask, userId: 'other-user' });
+    mockRepo.findTaskById.mockResolvedValueOnce({
+      ...mockTask,
+      userId: 'other-user',
+    });
 
     await expect(
       updateTask('task-uuid-123', { title: 'Updated' }, 'user-uuid-123')
@@ -106,10 +126,13 @@ describe('deleteTask', () => {
   });
 
   it('should throw Forbidden if user does not own the task', async () => {
-    mockRepo.findTaskById.mockResolvedValueOnce({ ...mockTask, userId: 'other-user' });
+    mockRepo.findTaskById.mockResolvedValueOnce({
+      ...mockTask,
+      userId: 'other-user',
+    });
 
-    await expect(
-      deleteTask('task-uuid-123', 'user-uuid-123')
-    ).rejects.toThrow('Forbidden');
+    await expect(deleteTask('task-uuid-123', 'user-uuid-123')).rejects.toThrow(
+      'Forbidden'
+    );
   });
 });

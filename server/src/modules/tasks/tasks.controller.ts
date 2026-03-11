@@ -1,7 +1,11 @@
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../auth/auth.middleware';
 import * as tasksService from './tasks.service';
-import { createTaskSchema, updateTaskSchema, filterTaskSchema } from './tasks.schema';
+import {
+  createTaskSchema,
+  updateTaskSchema,
+  filterTaskSchema,
+} from './tasks.schema';
 
 /**
  * GET /tasks
@@ -20,6 +24,7 @@ export const getTasks = async (
     const tasks = await tasksService.getTasksByUser(req.user.userId, filter);
     res.status(200).json(tasks);
   } catch (error) {
+    console.error('Error in tasks controller:', error); // Actually use it
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -44,6 +49,7 @@ export const createTask = async (
     const task = await tasksService.createTask(input.data, req.user.userId);
     res.status(201).json(task);
   } catch (error) {
+    console.error('Error in tasks controller:', error); // Actually use it
     res.status(500).json({ message: 'Internal server error' });
   }
 };
@@ -65,7 +71,11 @@ export const updateTask = async (
       res.status(400).json({ errors: input.error.flatten().fieldErrors });
       return;
     }
-    const task = await tasksService.updateTask(req.params.id, input.data, req.user.userId);
+    const task = await tasksService.updateTask(
+      req.params.id,
+      input.data,
+      req.user.userId
+    );
     res.status(200).json(task);
   } catch (error) {
     if (error instanceof Error && error.message === 'Forbidden') {

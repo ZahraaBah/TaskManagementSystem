@@ -55,9 +55,14 @@ export const register = async (
   };
 };
 
-export const login = async (
-  input: LoginInput
-): Promise<AuthResponseDto> => {
+/**
+ * Authenticates a user by verifying email and password.
+ *
+ * @param input - Validated login payload (email, password)
+ * @returns AuthResponseDto containing JWT token and user data
+ * @throws Error if credentials are invalid
+ */
+export const login = async (input: LoginInput): Promise<AuthResponseDto> => {
   const [user] = await db
     .select()
     .from(users)

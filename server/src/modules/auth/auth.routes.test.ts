@@ -36,9 +36,7 @@ beforeEach(async () => {
 
 describe('POST /auth/register', () => {
   it('should return 201 and token on successful registration', async () => {
-    const res = await request
-      .post('/auth/register')
-      .send(testUser);
+    const res = await request.post('/auth/register').send(testUser);
 
     expect(res.status).toBe(201);
     expect(res.body.token).toBeDefined();
@@ -67,18 +65,14 @@ describe('POST /auth/register', () => {
   it('should return 409 if email already exists', async () => {
     await request.post('/auth/register').send(testUser);
 
-    const res = await request
-      .post('/auth/register')
-      .send(testUser);
+    const res = await request.post('/auth/register').send(testUser);
 
     expect(res.status).toBe(409);
     expect(res.body.message).toBe('Email already in use');
   });
 
   it('response should conform to AuthResponseDto', async () => {
-    const res = await request
-      .post('/auth/register')
-      .send(testUser);
+    const res = await request.post('/auth/register').send(testUser);
 
     expect(res.body).toMatchObject({
       token: expect.any(String),
@@ -99,9 +93,7 @@ describe('POST /auth/login', () => {
   });
 
   it('should return 200 and token on valid credentials', async () => {
-    const res = await request
-      .post('/auth/login')
-      .send(testUser);
+    const res = await request.post('/auth/login').send(testUser);
 
     expect(res.status).toBe(200);
     expect(res.body.token).toBeDefined();
@@ -137,9 +129,7 @@ describe('POST /auth/login', () => {
   });
 
   it('response should conform to AuthResponseDto', async () => {
-    const res = await request
-      .post('/auth/login')
-      .send(testUser);
+    const res = await request.post('/auth/login').send(testUser);
 
     expect(res.body).toMatchObject({
       token: expect.any(String),

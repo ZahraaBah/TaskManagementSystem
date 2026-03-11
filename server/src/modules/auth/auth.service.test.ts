@@ -21,6 +21,7 @@ vi.mock('../../db', () => ({
 import { db } from '../../db';
 import { register, login } from './auth.service';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockDb = db as any;
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────

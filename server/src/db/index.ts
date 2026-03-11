@@ -1,8 +1,8 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
-import * as schema from "./schema";
-import * as dotenv from "dotenv";
-import * as path from "path";
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+import * as schema from './schema';
+import * as dotenv from 'dotenv';
+import * as path from 'path';
 
 const envPath = path.resolve(__dirname, '../../../.env.server');
 dotenv.config({ path: envPath });
