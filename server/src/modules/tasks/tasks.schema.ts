@@ -8,7 +8,11 @@ export const createTaskSchema = z.object({
 
 // ─── UPDATE TASK ─────────────────────────────────────────────────────────────
 export const updateTaskSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(255, 'Title too long').optional(),
+  title: z
+    .string()
+    .min(1, 'Title is required')
+    .max(255, 'Title too long')
+    .optional(),
   description: z.string().max(1000, 'Description too long').optional(),
   completed: z.boolean().optional(),
 });

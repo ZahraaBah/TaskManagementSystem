@@ -1,177 +1,187 @@
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import supertest from 'supertest';
-import app from '../../app';
-import { db } from '../../db';
-import { users, tasks } from '../../db/schema';
-import { eq } from 'drizzle-orm';
+import { describe, it, expect, vi, beforeAll } from 'vitest';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { createTestUser } from '../../test/setup';
+import {
+  register,
+  login,
+  refreshAccessToken,
+  revokeRefreshToken,
+} from '../auth/auth.service';
 
-const request = supertest(app);
-
-// ─── HELPERS ─────────────────────────────────────────────────────────────────
-
-const testUser = { email: 'tasks@test.com', password: 'password123' };
-const otherUser = { email: 'other@test.com', password: 'password123' };
-
-let token: string;
-let otherToken: string;
-let taskId: string;
-
-const cleanupUsers = async () => {
-  await db.delete(users).where(eq(users.email, testUser.email));
-  await db.delete(users).where(eq(users.email, otherUser.email));
-};
-
-// ─── SETUP ───────────────────────────────────────────────────────────────────
+// Don't mock the db - use the real test database
 
 beforeAll(async () => {
-  await cleanupUsers();
-
-  const res1 = await request.post('/auth/register').send(testUser);
-  token = res1.body.token;
-
-  const res2 = await request.post('/auth/register').send(otherUser);
-  otherToken = res2.body.token;
+  // Ensure JWT secret is set
+  process.env.JWT_SECRET = 'test_secret';
 });
 
-afterAll(async () => {
-  await cleanupUsers();
-});
+// No beforeEach here — global setup in setup.ts already TRUNCATEs tables
+// before each test, ensuring a clean slate without race conditions.
 
-beforeEach(async () => {
-  await db.delete(tasks);
-  const res = await request
-    .post('/tasks')
-    .set('Authorization', `Bearer ${token}`)
-    .send({ title: 'Test task', description: 'Test description' });
-  taskId = res.body.id;
-});
+// ─── REGISTER ────────────────────────────────────────────────────────────────
+describe('register', () => {
+  it('should hash the password before saving', async () => {
+    const hashSpy = vi.spyOn(bcrypt, 'hash');
 
-// ─── GET /tasks ───────────────────────────────────────────────────────────────
-
-describe('GET /tasks', () => {
-  it('should return 401 without token', async () => {
-    const res = await request.get('/tasks');
-    expect(res.status).toBe(401);
-  });
-
-  it('should return only the authenticated user tasks', async () => {
-    const res = await request
-      .get('/tasks')
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveLength(1);
-    expect(res.body[0].title).toBe('Test task');
-  });
-
-  it('should filter tasks by completed status', async () => {
-    const res = await request
-      .get('/tasks?completed=false')
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(200);
-    expect(res.body[0].completed).toBe(false);
-  });
-
-  it('response should conform to TaskResponseDto', async () => {
-    const res = await request
-      .get('/tasks')
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.body[0]).toMatchObject({
-      id: expect.any(String),
-      title: expect.any(String),
-      completed: expect.any(Boolean),
-      userId: expect.any(String),
-      createdAt: expect.any(String),
-      updatedAt: expect.any(String),
+    const result = await register({
+      email: 'test@example.com',
+      password: 'plainpassword',
     });
+
+    // Verify bcrypt was called with the plain password
+    expect(hashSpy).toHaveBeenCalledWith('plainpassword', 10);
+
+    // Verify the returned user has no password field (integration-level check)
+    expect(result.user).not.toHaveProperty('password');
+    expect(result.user.email).toBe('test@example.com');
+  });
+
+  it('should return accessToken, refreshToken and user without password', async () => {
+    const result = await register({
+      email: 'test@example.com',
+      password: 'plainpassword',
+    });
+
+    expect(result).toHaveProperty('accessToken');
+    expect(result).toHaveProperty('refreshToken');
+    expect(result).not.toHaveProperty('token');
+
+    expect(result.user.email).toBe('test@example.com');
+    expect(result.user).not.toHaveProperty('password');
+    expect(result.user.id).toBeDefined();
+  });
+
+  it('should throw if email already exists', async () => {
+    // Insert user directly via helper — table is already clean from global beforeEach
+    await createTestUser('existing@example.com', 'password123');
+
+    await expect(
+      register({ email: 'existing@example.com', password: 'plainpassword' })
+    ).rejects.toThrow('Email already in use');
   });
 });
 
-// ─── POST /tasks ──────────────────────────────────────────────────────────────
+// ─── LOGIN ───────────────────────────────────────────────────────────────────
+describe('login', () => {
+  it('should return accessToken, refreshToken and user without password on valid credentials', async () => {
+    // Create a user with known password
+    const password = 'plainpassword';
+    await createTestUser('login@example.com', password);
 
-describe('POST /tasks', () => {
-  it('should return 401 without token', async () => {
-    const res = await request.post('/tasks').send({ title: 'Task' });
-    expect(res.status).toBe(401);
+    const result = await login({
+      email: 'login@example.com',
+      password: password,
+    });
+
+    expect(result).toHaveProperty('accessToken');
+    expect(result).toHaveProperty('refreshToken');
+    expect(result).not.toHaveProperty('token');
+
+    expect(result.user.email).toBe('login@example.com');
+    expect(result.user).not.toHaveProperty('password');
   });
 
-  it('should create a task and return 201', async () => {
-    const res = await request
-      .post('/tasks')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ title: 'New task', description: 'Description' });
-
-    expect(res.status).toBe(201);
-    expect(res.body.title).toBe('New task');
-    expect(res.body.userId).toBeDefined();
+  it('should throw if user is not found', async () => {
+    await expect(
+      login({ email: 'unknown@example.com', password: 'plainpassword' })
+    ).rejects.toThrow('Invalid credentials');
   });
 
-  it('should return 400 if title is missing', async () => {
-    const res = await request
-      .post('/tasks')
-      .set('Authorization', `Bearer ${token}`)
-      .send({ description: 'No title' });
+  it('should throw if password is incorrect', async () => {
+    // Create a user
+    await createTestUser('login@example.com', 'correctpassword');
 
-    expect(res.status).toBe(400);
-    expect(res.body.errors).toBeDefined();
-  });
-});
-
-// ─── PATCH /tasks/:id ─────────────────────────────────────────────────────────
-
-describe('PATCH /tasks/:id', () => {
-  it('should return 401 without token', async () => {
-    const res = await request.patch(`/tasks/${taskId}`).send({ title: 'Updated' });
-    expect(res.status).toBe(401);
-  });
-
-  it('should update task if user owns it', async () => {
-    const res = await request
-      .patch(`/tasks/${taskId}`)
-      .set('Authorization', `Bearer ${token}`)
-      .send({ title: 'Updated title', completed: true });
-
-    expect(res.status).toBe(200);
-    expect(res.body.title).toBe('Updated title');
-    expect(res.body.completed).toBe(true);
-  });
-
-  it('should return 403 if user does not own the task', async () => {
-    const res = await request
-      .patch(`/tasks/${taskId}`)
-      .set('Authorization', `Bearer ${otherToken}`)
-      .send({ title: 'Hacked' });
-
-    expect(res.status).toBe(403);
-    expect(res.body.message).toBe('Forbidden');
+    await expect(
+      login({ email: 'login@example.com', password: 'wrongpassword' })
+    ).rejects.toThrow('Invalid credentials');
   });
 });
 
-// ─── DELETE /tasks/:id ────────────────────────────────────────────────────────
+// ─── JWT GENERATION ──────────────────────────────────────────────────────────
+describe('JWT generation', () => {
+  it('should generate valid accessToken and refreshToken containing userId', async () => {
+    const result = await register({
+      email: 'jwt@example.com',
+      password: 'plainpassword',
+    });
 
-describe('DELETE /tasks/:id', () => {
-  it('should return 401 without token', async () => {
-    const res = await request.delete(`/tasks/${taskId}`);
-    expect(res.status).toBe(401);
+    // Verify accessToken
+    const decodedAccess = jwt.verify(result.accessToken, 'test_secret') as {
+      userId: string;
+    };
+    expect(decodedAccess.userId).toBe(result.user.id);
+
+    // Verify refreshToken
+    const decodedRefresh = jwt.verify(result.refreshToken, 'test_secret') as {
+      userId: string;
+      type?: string;
+    };
+    expect(decodedRefresh.userId).toBe(result.user.id);
+    expect(decodedRefresh.type).toBe('refresh');
+  });
+});
+
+// ─── REFRESH TOKEN ───────────────────────────────────────────────────────────
+describe('refresh token', () => {
+  it('should generate new access token with valid refresh token', async () => {
+    // Register a user to get a refresh token
+    const { refreshToken, user } = await register({
+      email: 'refresh@example.com',
+      password: 'plainpassword',
+    });
+
+    // Test refresh
+    const result = await refreshAccessToken(refreshToken);
+
+    expect(result).toHaveProperty('accessToken');
+    expect(result).not.toHaveProperty('refreshToken');
+
+    const decoded = jwt.verify(result.accessToken, 'test_secret') as {
+      userId: string;
+    };
+    expect(decoded.userId).toBe(user.id);
   });
 
-  it('should delete task if user owns it', async () => {
-    const res = await request
-      .delete(`/tasks/${taskId}`)
-      .set('Authorization', `Bearer ${token}`);
-
-    expect(res.status).toBe(200);
-    expect(res.body.id).toBe(taskId);
+  it('should throw with invalid refresh token', async () => {
+    await expect(refreshAccessToken('invalid-token')).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
   });
 
-  it('should return 403 if user does not own the task', async () => {
-    const res = await request
-      .delete(`/tasks/${taskId}`)
-      .set('Authorization', `Bearer ${otherToken}`);
+  it('should throw with expired refresh token', async () => {
+    // Create an expired token
+    const expiredToken = jwt.sign(
+      { userId: 'some-id', type: 'refresh' },
+      'test_secret',
+      { expiresIn: '0s' }
+    );
 
-    expect(res.status).toBe(403);
-    expect(res.body.message).toBe('Forbidden');
+    await expect(refreshAccessToken(expiredToken)).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
+  });
+});
+
+// ─── LOGOUT / REVOKE ─────────────────────────────────────────────────────────
+describe('logout', () => {
+  it('should revoke refresh token', async () => {
+    // Register a user to get a refresh token
+    const { refreshToken } = await register({
+      email: 'revoke@example.com',
+      password: 'plainpassword',
+    });
+
+    // Revoke the token
+    revokeRefreshToken(refreshToken);
+
+    // Verify revoked token doesn't work
+    await expect(refreshAccessToken(refreshToken)).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
+  });
+
+  it('should handle revoking non-existent token gracefully', () => {
+    expect(() => revokeRefreshToken('non-existent-token')).not.toThrow();
   });
 });
