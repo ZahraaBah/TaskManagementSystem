@@ -8,13 +8,6 @@ import type { AuthResponseDto, UserResponseDto } from './auth.dto';
 
 const SALT_ROUNDS = 10;
 
-/**
- * Formats a user DB record into a safe UserResponseDto.
- * Ensures password is never exposed in responses.
- *
- * @param user - Raw user record from DB
- * @returns UserResponseDto without password
- */
 const toUserResponse = (user: {
   id: string;
   email: string;
@@ -25,28 +18,12 @@ const toUserResponse = (user: {
   createdAt: user.createdAt,
 });
 
-/**
- * Generates a signed JWT token for a given user ID.
- *
- * @param userId - The user's UUID
- * @returns Signed JWT string
- * @throws Error if JWT_SECRET is not set in environment
- */
 const generateToken = (userId: string): string => {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error('JWT_SECRET is not defined');
-
   return jwt.sign({ userId }, secret, { expiresIn: '7d' });
 };
 
-/**
- * Registers a new user with hashed password.
- * Checks for duplicate email before creating.
- *
- * @param input - Validated register payload (email, password)
- * @returns AuthResponseDto containing JWT token and user data
- * @throws Error if email already exists
- */
 export const register = async (
   input: RegisterInput
 ): Promise<AuthResponseDto> => {
@@ -78,13 +55,6 @@ export const register = async (
   };
 };
 
-/**
- * Authenticates a user by verifying email and password.
- *
- * @param input - Validated login payload (email, password)
- * @returns AuthResponseDto containing JWT token and user data
- * @throws Error if credentials are invalid
- */
 export const login = async (
   input: LoginInput
 ): Promise<AuthResponseDto> => {

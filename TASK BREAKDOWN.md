@@ -6,9 +6,9 @@
 - [x] Configure TypeScript - Zehra
 - [x] Setup Express - Zehra
 - [x] Setup PostgreSQL - Chiva
-- [x] Setup Drizzle - Zehra
-- [x] Setup frontend (Vite + Tailwind) - Chiva
-- [x] Setup testing frameworks - Chiva
+- [x] Setup Drizzle - ZAHRA
+- [x] Setup frontend (Vite + Tailwind) -Chiva
+- [ ] Setup testing frameworks -Chiva
 
 ---
 
@@ -25,15 +25,15 @@
 
 ## Phase 3 – Authentication
 
-- [x] Register endpoint - Zehra
-- [x] Hash password - Zehra
-- [x] Login endpoint - Zehra
-- [x] JWT generation - Zehra
-- [x] Auth middleware - Zehra
-- [x] Protect task routes - Zehra
-- [x] Unit tests for auth service - Zehra
-- [x] Integration tests for auth routes - Zehra
-- [x] Add docstrings - Zehra
+- [x] Register endpoint - ZAHRA
+- [x] Hash password - ZAHRA
+- [x] Login endpoint - ZAHRA
+- [x] JWT generation - ZAHRA
+- [x] Auth middleware - ZAHRA
+- [ ] Protect task routes
+- [x] Unit tests for auth service - ZAHRA
+- [x] Integration tests for auth routes - ZAHRA
+- [x] Add docstrings - ZAHRA
 
 ---
 
@@ -59,9 +59,9 @@
 - [x] Delete task - Chiva
 - [x] Loading states - Chiva
 - [x] Component tests - Chiva
-- [ ] Register page - Zehra
-- [ ] Login page - Zehra
-- [ ] Store JWT - Zehra
+- [x] Register page - Zehra
+- [x] Login page - Zehra
+- [] Store JWT - Zehra
 
 ---
 

@@ -4,12 +4,12 @@
 
 Build a full-stack, multi-user task management system with:
 
-* Authentication
-* Ownership enforcement
-* Clean layered architecture
-* Full TypeScript discipline
-* Documentation
-* Automated tests
+- Authentication
+- Ownership enforcement
+- Clean layered architecture
+- Full TypeScript discipline
+- Documentation
+- Automated tests
 
 ---
 
@@ -17,24 +17,24 @@ Build a full-stack, multi-user task management system with:
 
 ### Frontend
 
-* React
-* Vite
-* TypeScript
-* Tailwind CSS
-* React Testing Library
-* Vitest
+- React
+- Vite
+- TypeScript
+- Tailwind CSS
+- React Testing Library
+- Vitest
 
 ### Backend
 
-* Express
-* TypeScript
-* PostgreSQL
-* Drizzle ORM
-* Zod
-* bcrypt
-* JWT
-* Vitest or Jest
-* Supertest
+- Express
+- TypeScript
+- PostgreSQL
+- Drizzle ORM
+- Zod
+- bcrypt
+- JWT
+- Vitest or Jest
+- Supertest
 
 ---
 
@@ -69,13 +69,13 @@ Build a full-stack, multi-user task management system with:
 
 ### Architecture Rules
 
-* Controllers → HTTP only
-* Services → business logic
-* Repositories → DB access
-* No DB calls in controllers
-* No `any`
-* Zod validation for all input
-* DTOs (Data Transfer Objects) must be used for both all incoming requests and outgoing responses in the backend, defined per module (e.g., `auth.dto.ts`, `tasks.dto.ts`) and enforced across the codebase.
+- Controllers → HTTP only
+- Services → business logic
+- Repositories → DB access
+- No DB calls in controllers
+- No `any`
+- Zod validation for all input
+- DTOs (Data Transfer Objects) must be used for both all incoming requests and outgoing responses in the backend, defined per module (e.g., `auth.dto.ts`, `tasks.dto.ts`) and enforced across the codebase.
 
 ---
 
@@ -83,43 +83,43 @@ Build a full-stack, multi-user task management system with:
 
 ### users
 
-* id (uuid)
-* email (unique, not null)
-* password
-* createdAt
+- id (uuid)
+- email (unique, not null)
+- password
+- createdAt
 
 ### tasks
 
-* id (uuid)
-* title (not null)
-* description (nullable)
-* completed (boolean default false)
-* userId (foreign key → users.id)
-* createdAt
-* updatedAt
+- id (uuid)
+- title (not null)
+- description (nullable)
+- completed (boolean default false)
+- userId (foreign key → users.id)
+- createdAt
+- updatedAt
 
 Requirements:
 
-* Proper constraints
-* Foreign key enforced
-* Timestamps implemented
-* Migrations used (no manual DB edits)
+- Proper constraints
+- Foreign key enforced
+- Timestamps implemented
+- Migrations used (no manual DB edits)
 
 ---
 
 ## 🔐 Authentication & Authorization
 
-* Register
-* Login
-* JWT-based authentication
-* Password hashing with bcrypt
-* Protected routes
-* Ownership enforcement at query level
+- Register
+- Login
+- JWT-based authentication
+- Password hashing with bcrypt
+- Protected routes
+- Ownership enforcement at query level
 
 Must differentiate:
 
-* 401 → Not authenticated
-* 403 → Authenticated but forbidden
+- 401 → Not authenticated
+- 403 → Authenticated but forbidden
 
 ---
 
@@ -127,32 +127,32 @@ Must differentiate:
 
 ### Docstrings Required For
 
-* All service methods
-* Complex utility functions
-* Middleware with logic
+- All service methods
+- Complex utility functions
+- Middleware with logic
 
 Each docstring must include:
 
-* Purpose
-* Parameters
-* Return type
-* Possible errors
+- Purpose
+- Parameters
+- Return type
+- Possible errors
 
 ---
 
 ### README Must Include
 
-* Project overview
-* Tech stack
-* Folder structure explanation
-* Setup instructions
-* Environment variables
-* Migration commands
-* How to run server
-* How to run frontend
-* How to run tests
-* API endpoint summary
-* Architecture explanation
+- Project overview
+- Tech stack
+- Folder structure explanation
+- Setup instructions
+- Environment variables
+- Migration commands
+- How to run server
+- How to run frontend
+- How to run tests
+- API endpoint summary
+- Architecture explanation
 
 If README cannot reproduce the project → incomplete.
 
@@ -174,45 +174,45 @@ Build a full-stack task management application supporting authentication, owners
 
 ### Authentication
 
-* Register with email and password
-* Login
-* Password hashing
-* JWT authentication
-* Protected routes
+- Register with email and password
+- Login
+- Password hashing
+- JWT authentication
+- Protected routes
 
 ### Tasks
 
 Authenticated users must be able to:
 
-* Create tasks
-* View only their own tasks
-* Update their own tasks
-* Delete their own tasks
-* Filter tasks by completed status
+- Create tasks
+- View only their own tasks
+- Update their own tasks
+- Delete their own tasks
+- Filter tasks by completed status
 
 ---
 
 ## Technical Requirements
 
-* Layered backend architecture
-* Zod validation
-* Drizzle migrations
-* Type-safe codebase
-* No `any`
-* Proper HTTP status codes
-* Ownership enforced in database queries
-* Clean Git history
-* DTOs enforced for all backend request payloads and response objects. All request bodies and API responses MUST adhere to module-defined DTO (Data Transfer Object) types.
+- Layered backend architecture
+- Zod validation
+- Drizzle migrations
+- Type-safe codebase
+- No `any`
+- Proper HTTP status codes
+- Ownership enforced in database queries
+- Clean Git history
+- DTOs enforced for all backend request payloads and response objects. All request bodies and API responses MUST adhere to module-defined DTO (Data Transfer Object) types.
 
 ---
 
 ## Documentation Requirements
 
-* Docstrings in services
-* Clear README
-* Setup instructions must work
-* API documented
-* All DTOs documented.
+- Docstrings in services
+- Clear README
+- Setup instructions must work
+- API documented
+- All DTOs documented.
 
 ---
 
@@ -222,13 +222,13 @@ You must implement:
 
 Backend:
 
-* Unit tests (services)
-* Integration tests (API routes)
+- Unit tests (services)
+- Integration tests (API routes)
 
 Frontend:
 
-* Component tests
-* Protected route test
+- Component tests
+- Protected route test
 
 Tests must pass before submission.
 
@@ -236,11 +236,11 @@ Tests must pass before submission.
 
 ## Deliverables
 
-* Git repository
-* Passing tests
-* Working application
-* Clean README
-* Professional structure
+- Git repository
+- Passing tests
+- Working application
+- Clean README
+- Professional structure
 
 ---
 
@@ -252,21 +252,20 @@ Tests must pass before submission.
 
 Test:
 
-* Auth service
+- Auth service
+  - Password hashing
+  - Password comparison
+  - JWT generation
 
-  * Password hashing
-  * Password comparison
-  * JWT generation
-* Task service
-
-  * Task creation
-  * Task filtering by user
-  * Ownership enforcement
+- Task service
+  - Task creation
+  - Task filtering by user
+  - Ownership enforcement
 
 Unit tests must:
 
-* Test logic, not Express
-* Mock repository layer where appropriate
+- Test logic, not Express
+- Mock repository layer where appropriate
 
 ---
 
@@ -276,19 +275,19 @@ Using Supertest:
 
 Must test:
 
-* POST /auth/register → 201
-* POST /auth/login → returns token
-* GET /tasks without token → 401
-* POST /tasks with token → 201
-* GET /tasks returns only user's tasks
-* Accessing another user's task → 403
+- POST /auth/register → 201
+- POST /auth/login → returns token
+- GET /tasks without token → 401
+- POST /tasks with token → 201
+- GET /tasks returns only user's tasks
+- Accessing another user's task → 403
 
 Integration tests must:
 
-* Hit real routes
-* Use test database
-* Not mock everything
-* Validate request and response DTOs are strictly enforced and tested, including error DTOs.
+- Hit real routes
+- Use test database
+- Not mock everything
+- Validate request and response DTOs are strictly enforced and tested, including error DTOs.
 
 ---
 
@@ -296,22 +295,22 @@ Integration tests must:
 
 Must include:
 
-* TaskList renders tasks
-* ProtectedRoute blocks unauthenticated user
-* At least one interaction test (e.g., mark task complete)
+- TaskList renders tasks
+- ProtectedRoute blocks unauthenticated user
+- At least one interaction test (e.g., mark task complete)
 
 Do not:
 
-* Test implementation details
-* Overuse snapshots
+- Test implementation details
+- Overuse snapshots
 
 ---
 
 ## Minimum Standard
 
-* Tests must assert behavior
-* Tests must fail if logic breaks
-* Clear separation between unit and integration
+- Tests must assert behavior
+- Tests must fail if logic breaks
+- Clear separation between unit and integration
 
 ---
 
@@ -319,68 +318,68 @@ Do not:
 
 ## Architecture
 
-* [ ] Proper layered structure
-* [ ] No DB access in controllers
-* [ ] No massive files
-* [ ] Clean modular separation
+- [ ] Proper layered structure
+- [ ] No DB access in controllers
+- [ ] No massive files
+- [ ] Clean modular separation
 
 ---
 
 ## TypeScript
 
-* [ ] No `any`
-* [ ] Proper return types
-* [ ] Types inferred from schema
-* [ ] Zod validation used
-* [ ] All backend input and output enforced via DTOs
+- [ ] No `any`
+- [ ] Proper return types
+- [ ] Types inferred from schema
+- [ ] Zod validation used
+- [ ] All backend input and output enforced via DTOs
 
 ---
 
 ## Security
 
-* [ ] Passwords hashed
-* [ ] JWT secret in env
-* [ ] Protected routes enforced
-* [ ] Ownership checked in DB queries
-* [ ] No password in responses
+- [ ] Passwords hashed
+- [ ] JWT secret in env
+- [ ] Protected routes enforced
+- [ ] Ownership checked in DB queries
+- [ ] No password in responses
 
 ---
 
 ## Database
 
-* [ ] Proper constraints
-* [ ] Foreign keys implemented
-* [ ] Migrations used
-* [ ] Indexes where appropriate
+- [ ] Proper constraints
+- [ ] Foreign keys implemented
+- [ ] Migrations used
+- [ ] Indexes where appropriate
 
 ---
 
 ## Documentation
 
-* [ ] Docstrings complete
-* [ ] README clear and reproducible
-* [ ] Environment variables documented
-* [ ] API endpoints listed
-* [ ] DTOs documented
+- [ ] Docstrings complete
+- [ ] README clear and reproducible
+- [ ] Environment variables documented
+- [ ] API endpoints listed
+- [ ] DTOs documented
 
 ---
 
 ## Testing
 
-* [ ] Unit tests implemented
-* [ ] Integration tests implemented
-* [ ] Frontend tests implemented
-* [ ] Meaningful assertions
-* [ ] Unauthorized access tested
-* [ ] Ownership enforcement tested
-* [ ] API requests and responses conform to DTOs
+- [ ] Unit tests implemented
+- [ ] Integration tests implemented
+- [ ] Frontend tests implemented
+- [ ] Meaningful assertions
+- [ ] Unauthorized access tested
+- [ ] Ownership enforcement tested
+- [ ] API requests and responses conform to DTOs
 
 ---
 
 ## Code Quality
 
-* [ ] Clear naming
-* [ ] No dead code
-* [ ] No console logs
-* [ ] Clean formatting
-* [ ] Small focused functions
+- [ ] Clear naming
+- [ ] No dead code
+- [ ] No console logs
+- [ ] Clean formatting
+- [ ] Small focused functions

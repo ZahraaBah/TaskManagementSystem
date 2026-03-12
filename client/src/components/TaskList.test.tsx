@@ -31,7 +31,10 @@ describe('TaskList', () => {
 
   it('toggles task completion on checkbox click', async () => {
     const onTasksChange = vi.fn();
-    vi.mocked(tasksApi.updateTask).mockResolvedValueOnce({ ...mockTasks[0], completed: true });
+    vi.mocked(tasksApi.updateTask).mockResolvedValueOnce({
+      ...mockTasks[0],
+      completed: true,
+    });
 
     render(<TaskList tasks={mockTasks} onTasksChange={onTasksChange} />);
     fireEvent.click(screen.getByTestId('task-checkbox'));

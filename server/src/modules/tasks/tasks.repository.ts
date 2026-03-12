@@ -7,6 +7,7 @@ import type { Task } from '../../db/schema';
 /**
  * Retrieves all tasks belonging to a specific user.
  * Optionally filters by completed status.
+ * Optimized with indexes on userId and completed.
  *
  * @param userId - The authenticated user's UUID
  * @param completed - Optional filter for completion status
@@ -27,12 +28,17 @@ export const findTasksByUserId = async (
 
 /**
  * Retrieves a single task by ID.
+ * Uses primary key index for fast lookup.
  *
  * @param id - Task UUID
  * @returns Task record or undefined if not found
  */
 export const findTaskById = async (id: string): Promise<Task | undefined> => {
-  const [task] = await db.select().from(tasks).where(eq(tasks.id, id)).limit(1);
+  const [task] = await db
+    .select()
+    .from(tasks)
+    .where(eq(tasks.id, id))
+    .limit(1);
   return task;
 };
 
@@ -60,6 +66,7 @@ export const createTask = async (
 
 /**
  * Updates an existing task by ID.
+ * Uses primary key index for fast update.
  *
  * @param id - Task UUID
  * @param input - Validated update payload
@@ -79,6 +86,7 @@ export const updateTask = async (
 
 /**
  * Deletes a task by ID.
+ * Uses primary key index for fast deletion.
  *
  * @param id - Task UUID
  * @returns Deleted Task record or undefined if not found
