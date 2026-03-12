@@ -1,67 +1,55 @@
 import { beforeAll, afterAll, beforeEach } from 'vitest';
-import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
-import { Pool } from 'pg';
 import * as schema from '../db/schema';
-import * as dotenv from 'dotenv';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import type { Task } from '../db/schema'; // Import du type Task
 
-dotenv.config({ path: '.env.test' });
+if (!process.env.DATABASE_URL?.includes('_test')) {
+  throw new Error(
+    '❌ DATABASE_URL must contain "_test" to run tests safely. Check your .env.test file.'
+  );
+}
 
-let pool: Pool;
-let db: ReturnType<typeof drizzle>;
+import { db } from '../db';
+export { db };
 
 beforeAll(async () => {
-  console.log('🧪 Setting up test database...');
-
-  if (!process.env.DATABASE_URL?.includes('_test')) {
-    throw new Error('❌ Tests must use test database!');
+  try {
+    await db.execute(sql`SELECT 1`);
+    console.log('✅ Test database connected');
+  } catch (error) {
+    console.error('❌ Failed to connect to test database:', error);
+    throw error;
   }
-
-  pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
-
-  db = drizzle(pool, { schema });
-  console.log('✅ Test database connected');
 });
 
 beforeEach(async () => {
-  await db.execute(sql`TRUNCATE TABLE users CASCADE`);
-  await db.execute(sql`TRUNCATE TABLE tasks CASCADE`);
+  try {
+    await db.execute(sql`TRUNCATE TABLE tasks, users CASCADE`);
+  } catch (error) {
+    console.warn('⚠️  Could not truncate tables:', error);
+  }
 });
 
 afterAll(async () => {
-  await pool?.end();
-  console.log('✅ Test database closed');
+  console.log('✅ Tests complete');
 });
 
-// Helpers
 export const createTestUser = async (
   email = 'test@example.com',
   password = 'password123'
 ) => {
   const hashedPassword = await bcrypt.hash(password, 10);
-
   const [user] = await db
     .insert(schema.users)
-    .values({
-      email,
-      password: hashedPassword,
-    })
+    .values({ email, password: hashedPassword })
     .returning();
-
   return user;
 };
 
-// CORRIGÉ: Remplacer 'any' par un type partiel de Task
 export const createTestTask = async (
   userId: string,
-  overrides: Partial<
-    Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'userId'>
-  > = {}
+  overrides: Record<string, unknown> = {}
 ) => {
   const [task] = await db
     .insert(schema.tasks)
@@ -73,12 +61,9 @@ export const createTestTask = async (
       ...overrides,
     })
     .returning();
-
   return task;
 };
 
 export const getAuthToken = (userId: string) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 };
-
-export { db };

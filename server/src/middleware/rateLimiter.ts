@@ -7,6 +7,12 @@ interface RateLimiterOptions {
   message?: string;
 }
 
+const getClientIp = (req: Request): string => {
+  const raw = req.ip ?? req.socket.remoteAddress ?? 'unknown';
+  // Normalize IPv4-mapped IPv6 addresses (::ffff:1.2.3.4 → 1.2.3.4)
+  return raw.replace(/^::ffff:/, '');
+};
+
 export const createRateLimiter = (options: RateLimiterOptions = {}) => {
   const windowMs =
     options.windowMs ?? parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '900000');
@@ -19,15 +25,12 @@ export const createRateLimiter = (options: RateLimiterOptions = {}) => {
     message: options.message ?? 'Too many requests, please try again later.',
     standardHeaders: true,
     legacyHeaders: false,
-    // Fix: Prefix unused parameter with underscore
-    skip: (_req: Request) => {
-      return process.env.NODE_ENV === 'test';
-    },
-    // Fix: Replace 'any' with proper type
+    skip: () => process.env.NODE_ENV === 'test',
     keyGenerator: (req: Request): string => {
-      const user = (req as { user?: { userId: string } }).user;
-      return user?.userId ?? req.ip ?? 'unknown';
+      if (process.env.NODE_ENV === 'test') return 'test-key';
+      return getClientIp(req);
     },
+    validate: { xForwardedForHeader: false },
   });
 };
 
