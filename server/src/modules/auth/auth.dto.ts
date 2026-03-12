@@ -37,11 +37,13 @@ export interface UserResponseDto {
 
 /**
  * Returned after successful register or login.
- * @property token - Signed JWT token (expires in 7 days)
+ * @property accessToken - Short-lived JWT token (expires in 15 minutes)
+ * @property refreshToken - Long-lived token for getting new access tokens
  * @property user - Safe user object without password
  */
 export interface AuthResponseDto {
-  token: string;
+  accessToken: string; // ← Changé de 'token' à 'accessToken'
+  refreshToken: string; // ← Ajouté
   user: UserResponseDto;
 }
 
@@ -61,4 +63,18 @@ export interface ErrorResponseDto {
  */
 export interface ValidationErrorDto {
   errors: Record<string, string[]>;
+}
+
+/**
+ * Request DTO for refreshing tokens
+ */
+export interface RefreshTokenRequestDto {
+  refreshToken: string;
+}
+
+/**
+ * Response DTO for token refresh
+ */
+export interface TokenResponseDto {
+  accessToken: string;
 }

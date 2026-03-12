@@ -1,4 +1,5 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+// import type { AuthenticatedRequest } from './auth.middleware';
 import * as authService from './auth.service';
 import { registerSchema, loginSchema } from './auth.schema';
 
@@ -62,5 +63,52 @@ export const loginController = async (
       return;
     }
     res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+/**
+ * Handles token refresh
+ */
+export const refreshTokenController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      res.status(400).json({ message: 'Refresh token required' });
+      return;
+    }
+
+    const result = await authService.refreshAccessToken(refreshToken);
+    res.json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Handles user logout
+ */
+
+export const logoutController = async (
+  req: Request, // ← Utiliser Request au lieu de AuthenticatedRequest
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+      res.status(400).json({ message: 'Refresh token required' });
+      return;
+    }
+
+    await authService.revokeRefreshToken(refreshToken);
+    res.status(204).send();
+  } catch (error) {
+    next(error);
   }
 };

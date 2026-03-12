@@ -1,12 +1,15 @@
-import * as dotenv from 'dotenv';
-import express, { Request, Response, NextFunction } from 'express'; // Add proper types
+import express from 'express';
 import cors from 'cors';
 import authRoutes from './modules/auth/auth.routes';
 import tasksRoutes from './modules/tasks/tasks.routes';
 import { apiLimiter, authLimiter } from './middleware/rateLimiter';
+import { errorHandler } from './middleware/errorHandler';
+import { sanitizeInput } from './middleware/sanitize';
+import { requestLogger } from './utils/logger';
+import { validateEnv } from './utils/validateEnv';
 
-const envFile = `.env.${process.env.NODE_ENV ?? 'development'}`;
-dotenv.config({ path: envFile });
+// Valider les variables d'env au démarrage
+validateEnv();
 
 const app = express();
 
@@ -18,8 +21,10 @@ app.use(
   })
 );
 app.use(express.json());
+app.use(requestLogger);
+app.use(sanitizeInput);
 
-// Apply rate limiting
+// Rate limiting
 app.use('/api/auth', authLimiter);
 app.use('/api', apiLimiter);
 
@@ -28,19 +33,16 @@ app.use('/api/auth', authRoutes);
 app.use('/api/tasks', tasksRoutes);
 
 // Health check
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', environment: process.env.NODE_ENV });
 });
 
 // 404 handler
-app.use((req: Request, res: Response) => {
+app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Error handler - Replace 'any' with proper types
-app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
-});
+// Error handler
+app.use(errorHandler);
 
 export default app;

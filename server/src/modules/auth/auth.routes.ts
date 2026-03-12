@@ -1,20 +1,17 @@
 import { Router } from 'express';
-import { registerController, loginController } from './auth.controller';
+import {
+  registerController,
+  loginController,
+  refreshTokenController,
+  logoutController,
+} from './auth.controller';
+import { authenticate } from './auth.middleware';
 
 const router = Router();
 
-/**
- * @route   POST /auth/register
- * @desc    Register a new user
- * @access  Public
- */
 router.post('/register', registerController);
-
-/**
- * @route   POST /auth/login
- * @desc    Login and receive JWT token
- * @access  Public
- */
 router.post('/login', loginController);
+router.post('/refresh', refreshTokenController);
+router.post('/logout', authenticate, logoutController); // ← L'ordre est important!
 
 export default router;
