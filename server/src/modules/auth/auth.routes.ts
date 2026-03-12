@@ -1,5 +1,11 @@
 import { Router } from 'express';
-import { registerController, loginController } from './auth.controller';
+import {
+  registerController,
+  loginController,
+  refreshTokenController,
+  logoutController,
+} from './auth.controller';
+import { authenticate } from './auth.middleware';
 
 const router = Router();
 
@@ -20,7 +26,7 @@ const router = Router();
  *           type: string
  *           format: date-time
  *           example: "2024-01-01T00:00:00.000Z"
- *     
+ *
  *     AuthResponse:
  *       type: object
  *       properties:
@@ -29,14 +35,14 @@ const router = Router();
  *           example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  *         user:
  *           $ref: '#/components/schemas/User'
- *     
+ *
  *     ErrorResponse:
  *       type: object
  *       properties:
  *         message:
  *           type: string
  *           example: "Invalid credentials"
- *     
+ *
  *     ValidationError:
  *       type: object
  *       properties:
@@ -148,5 +154,7 @@ router.post('/register', registerController);
  *               $ref: '#/components/schemas/ValidationError'
  */
 router.post('/login', loginController);
+router.post('/refresh', refreshTokenController);
+router.post('/logout', authenticate, logoutController); // ← L'ordre est important!
 
 export default router;

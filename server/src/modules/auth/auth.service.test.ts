@@ -3,9 +3,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 // ─── Mock DB ─────────────────────────────────────────────────────────────────
-
-// FIX: i had errors in tge first syntax (methods like .select().from().where()) and fixed it with this mock..
-
 vi.mock('../../db', () => ({
   db: {
     select: vi.fn().mockReturnThis(),
@@ -19,13 +16,17 @@ vi.mock('../../db', () => ({
 }));
 
 import { db } from '../../db';
-import { register, login } from './auth.service';
+import {
+  register,
+  login,
+  refreshAccessToken,
+  revokeRefreshToken,
+} from './auth.service';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mockDb = db as any;
 
 // ─── HELPERS ─────────────────────────────────────────────────────────────────
-
 const mockUser = {
   id: 'uuid-123',
   email: 'test@example.com',
@@ -35,12 +36,10 @@ const mockUser = {
 
 beforeEach(() => {
   vi.clearAllMocks();
-
   process.env.JWT_SECRET = 'test_secret';
 });
 
 // ─── REGISTER ────────────────────────────────────────────────────────────────
-
 describe('register', () => {
   it('should hash the password before saving', async () => {
     mockDb.select().from().where().limit.mockResolvedValueOnce([]);
@@ -53,7 +52,7 @@ describe('register', () => {
     expect(hashSpy).toHaveBeenCalledWith('plainpassword', 10);
   });
 
-  it('should return a token and user without password', async () => {
+  it('should return accessToken, refreshToken and user without password', async () => {
     mockDb.select().from().where().limit.mockResolvedValueOnce([]);
     mockDb.insert().values().returning.mockResolvedValueOnce([mockUser]);
 
@@ -62,14 +61,16 @@ describe('register', () => {
       password: 'plainpassword',
     });
 
-    expect(result.token).toBeDefined();
+    // Vérifier les nouveaux champs
+    expect(result).toHaveProperty('accessToken');
+    expect(result).toHaveProperty('refreshToken');
+    expect(result).not.toHaveProperty('token'); // ← L'ancien champ ne doit plus exister
+
     expect(result.user.email).toBe(mockUser.email);
-    // Ensures password is never exposed in the response — enforced by UserResponseDto
     expect(result.user).not.toHaveProperty('password');
   });
 
   it('should throw if email already exists', async () => {
-    // Simulate a user already in the DB to trigger the duplicate email check
     mockDb.select().from().where().limit.mockResolvedValueOnce([mockUser]);
 
     await expect(
@@ -79,9 +80,8 @@ describe('register', () => {
 });
 
 // ─── LOGIN ───────────────────────────────────────────────────────────────────
-
 describe('login', () => {
-  it('should return a token and user without password on valid credentials', async () => {
+  it('should return accessToken, refreshToken and user without password on valid credentials', async () => {
     const hashedPassword = await bcrypt.hash('plainpassword', 10);
     const userWithHash = { ...mockUser, password: hashedPassword };
 
@@ -92,7 +92,11 @@ describe('login', () => {
       password: 'plainpassword',
     });
 
-    expect(result.token).toBeDefined();
+    // Vérifier les nouveaux champs
+    expect(result).toHaveProperty('accessToken');
+    expect(result).toHaveProperty('refreshToken');
+    expect(result).not.toHaveProperty('token'); // ← L'ancien champ ne doit plus exister
+
     expect(result.user.email).toBe(mockUser.email);
     expect(result.user).not.toHaveProperty('password');
   });
@@ -117,10 +121,9 @@ describe('login', () => {
   });
 });
 
-// ─── JWT ─────────────────────────────────────────────────────────────────────
-
+// ─── JWT GENERATION ──────────────────────────────────────────────────────────
 describe('JWT generation', () => {
-  it('should generate a valid JWT containing userId', async () => {
+  it('should generate valid accessToken and refreshToken containing userId', async () => {
     mockDb.select().from().where().limit.mockResolvedValueOnce([]);
     mockDb.insert().values().returning.mockResolvedValueOnce([mockUser]);
 
@@ -129,11 +132,71 @@ describe('JWT generation', () => {
       password: 'plainpassword',
     });
 
-    // Decode and verify the token to ensure it carries the correct userId payload
-    const decoded = jwt.verify(result.token, 'test_secret') as {
+    // Vérifier l'accessToken
+    const decodedAccess = jwt.verify(result.accessToken, 'test_secret') as {
       userId: string;
     };
+    expect(decodedAccess.userId).toBe(mockUser.id);
 
+    // Vérifier le refreshToken
+    const decodedRefresh = jwt.verify(result.refreshToken, 'test_secret') as {
+      userId: string;
+      type?: string;
+    };
+    expect(decodedRefresh.userId).toBe(mockUser.id);
+    expect(decodedRefresh.type).toBe('refresh');
+  });
+});
+
+// ─── REFRESH TOKEN ───────────────────────────────────────────────────────────
+describe('refresh token', () => {
+  it('should generate new access token with valid refresh token', async () => {
+    // D'abord, enregistrer un user pour avoir un refresh token
+    mockDb.select().from().where().limit.mockResolvedValueOnce([]);
+    mockDb.insert().values().returning.mockResolvedValueOnce([mockUser]);
+
+    const { refreshToken } = await register({
+      email: mockUser.email,
+      password: 'plainpassword',
+    });
+
+    // Tester le refresh
+    const result = await refreshAccessToken(refreshToken);
+
+    expect(result).toHaveProperty('accessToken');
+    expect(result).not.toHaveProperty('refreshToken'); // Nouveau refresh token n'est pas retourné
+
+    const decoded = jwt.verify(result.accessToken, 'test_secret') as {
+      userId: string;
+    };
     expect(decoded.userId).toBe(mockUser.id);
+  });
+
+  it('should throw with invalid refresh token', async () => {
+    await expect(refreshAccessToken('invalid-token')).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
+  });
+});
+
+// ─── LOGOUT / REVOKE ─────────────────────────────────────────────────────────
+describe('logout', () => {
+  it('should revoke refresh token', async () => {
+    // D'abord, enregistrer un user pour avoir un refresh token
+    mockDb.select().from().where().limit.mockResolvedValueOnce([]);
+    mockDb.insert().values().returning.mockResolvedValueOnce([mockUser]);
+
+    const { refreshToken } = await register({
+      email: mockUser.email,
+      password: 'plainpassword',
+    });
+
+    // Révoquer le token
+    revokeRefreshToken(refreshToken);
+
+    // Vérifier que le token révoqué ne fonctionne plus
+    await expect(refreshAccessToken(refreshToken)).rejects.toThrow(
+      'Invalid or expired refresh token'
+    );
   });
 });
