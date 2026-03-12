@@ -18,7 +18,9 @@ export interface AuthResponse {
  * Sends a register request to the backend.
  * @throws Error with backend message if request fails
  */
-export const registerApi = async (payload: AuthPayload): Promise<AuthResponse> => {
+export const registerApi = async (
+  payload: AuthPayload
+): Promise<AuthResponse> => {
   const res = await fetch(`${API_URL}/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

@@ -1,6 +1,7 @@
-import { createContext, useContext, useState } from 'react';  // Enlève useEffect
+// @refresh reset
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
-// import { api } from './api/auth';  ← À SUPPRIMER ou commenter
 
 interface User {
   id: string;
@@ -11,7 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, user: User) => void;  // ← Change la signature
+  login: (token: string, user: User) => void; // ← Change la signature
   logout: () => void;
   isAuthenticated: boolean;
 }

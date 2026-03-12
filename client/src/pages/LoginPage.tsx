@@ -12,103 +12,150 @@ const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setError(null);
-  setLoading(true);
-  try {
-    const data = await loginApi({ email, password });
-    console.log('API response:', data); // ← Vérifie ce que retourne l'API
-    login(data.token, data.user);
-    console.log('After login - token in localStorage:', localStorage.getItem('auth_token')); // ← Vérifie le stockage
-    navigate('/tasks');
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Something went wrong');
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    try {
+      const data = await loginApi({ email, password });
+      console.log('API response:', data); // ← Vérifie ce que retourne l'API
+      login(data.token, data.user);
+      console.log(
+        'After login - token in localStorage:',
+        localStorage.getItem('auth_token')
+      ); // ← Vérifie le stockage
+      navigate('/tasks');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: "'Georgia', serif",
-      padding: '1rem',
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background:
+          'linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: "'Georgia', serif",
+        padding: '1rem',
+      }}
+    >
       {/* Decorative background circles */}
-      <div style={{
-        position: 'fixed', top: '-100px', right: '-100px',
-        width: '400px', height: '400px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
-      <div style={{
-        position: 'fixed', bottom: '-150px', left: '-100px',
-        width: '500px', height: '500px', borderRadius: '50%',
-        background: 'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)',
-        pointerEvents: 'none',
-      }} />
+      <div
+        style={{
+          position: 'fixed',
+          top: '-100px',
+          right: '-100px',
+          width: '400px',
+          height: '400px',
+          borderRadius: '50%',
+          background:
+            'radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'fixed',
+          bottom: '-150px',
+          left: '-100px',
+          width: '500px',
+          height: '500px',
+          borderRadius: '50%',
+          background:
+            'radial-gradient(circle, rgba(139,92,246,0.1) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }}
+      />
 
-      <div style={{
-        background: 'rgba(255,255,255,0.04)',
-        backdropFilter: 'blur(20px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '20px',
-        padding: '48px',
-        width: '100%',
-        maxWidth: '420px',
-        boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
-        position: 'relative',
-      }}>
+      <div
+        style={{
+          background: 'rgba(255,255,255,0.04)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderRadius: '20px',
+          padding: '48px',
+          width: '100%',
+          maxWidth: '420px',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
+          position: 'relative',
+        }}
+      >
         {/* Logo / Brand */}
         <div style={{ marginBottom: '36px' }}>
-          <div style={{
-            width: '44px', height: '44px',
-            background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-            borderRadius: '12px',
-            marginBottom: '20px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
+          <div
+            style={{
+              width: '44px',
+              height: '44px',
+              background: 'linear-gradient(135deg, #6366f1, #8b5cf6)',
+              borderRadius: '12px',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
             <span style={{ color: 'white', fontSize: '20px' }}>✓</span>
           </div>
-          <h1 style={{
-            color: 'white', fontSize: '26px',
-            fontWeight: '700', margin: '0 0 6px 0',
-            letterSpacing: '-0.5px',
-          }}>
+          <h1
+            style={{
+              color: 'white',
+              fontSize: '26px',
+              fontWeight: '700',
+              margin: '0 0 6px 0',
+              letterSpacing: '-0.5px',
+            }}
+          >
             Welcome back
           </h1>
-          <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '14px', margin: 0 }}>
+          <p
+            style={{
+              color: 'rgba(255,255,255,0.4)',
+              fontSize: '14px',
+              margin: 0,
+            }}
+          >
             Sign in to your account to continue
           </p>
         </div>
 
         {error && (
-          <div style={{
-            background: 'rgba(239,68,68,0.1)',
-            border: '1px solid rgba(239,68,68,0.3)',
-            color: '#fca5a5',
-            padding: '12px 16px',
-            borderRadius: '10px',
-            fontSize: '13px',
-            marginBottom: '20px',
-          }}>
+          <div
+            style={{
+              background: 'rgba(239,68,68,0.1)',
+              border: '1px solid rgba(239,68,68,0.3)',
+              color: '#fca5a5',
+              padding: '12px 16px',
+              borderRadius: '10px',
+              fontSize: '13px',
+              marginBottom: '20px',
+            }}
+          >
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <form
+          onSubmit={handleSubmit}
+          style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}
+        >
           <div>
-            <label style={{
-              display: 'block', color: 'rgba(255,255,255,0.6)',
-              fontSize: '12px', fontWeight: '600',
-              letterSpacing: '0.8px', textTransform: 'uppercase',
-              marginBottom: '8px',
-            }}>
+            <label
+              style={{
+                display: 'block',
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: '12px',
+                fontWeight: '600',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+              }}
+            >
               Email
             </label>
             <input
@@ -118,27 +165,38 @@ const handleSubmit = async (e: React.FormEvent) => {
               required
               placeholder="you@example.com"
               style={{
-                width: '100%', boxSizing: 'border-box',
+                width: '100%',
+                boxSizing: 'border-box',
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '10px',
                 padding: '12px 16px',
-                color: 'white', fontSize: '14px',
+                color: 'white',
+                fontSize: '14px',
                 outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={(e) => e.target.style.borderColor = 'rgba(99,102,241,0.6)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              onFocus={(e) =>
+                (e.target.style.borderColor = 'rgba(99,102,241,0.6)')
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = 'rgba(255,255,255,0.1)')
+              }
             />
           </div>
 
           <div>
-            <label style={{
-              display: 'block', color: 'rgba(255,255,255,0.6)',
-              fontSize: '12px', fontWeight: '600',
-              letterSpacing: '0.8px', textTransform: 'uppercase',
-              marginBottom: '8px',
-            }}>
+            <label
+              style={{
+                display: 'block',
+                color: 'rgba(255,255,255,0.6)',
+                fontSize: '12px',
+                fontWeight: '600',
+                letterSpacing: '0.8px',
+                textTransform: 'uppercase',
+                marginBottom: '8px',
+              }}
+            >
               Password
             </label>
             <input
@@ -148,17 +206,23 @@ const handleSubmit = async (e: React.FormEvent) => {
               required
               placeholder="••••••••"
               style={{
-                width: '100%', boxSizing: 'border-box',
+                width: '100%',
+                boxSizing: 'border-box',
                 background: 'rgba(255,255,255,0.06)',
                 border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '10px',
                 padding: '12px 16px',
-                color: 'white', fontSize: '14px',
+                color: 'white',
+                fontSize: '14px',
                 outline: 'none',
                 transition: 'border-color 0.2s',
               }}
-              onFocus={(e) => e.target.style.borderColor = 'rgba(99,102,241,0.6)'}
-              onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
+              onFocus={(e) =>
+                (e.target.style.borderColor = 'rgba(99,102,241,0.6)')
+              }
+              onBlur={(e) =>
+                (e.target.style.borderColor = 'rgba(255,255,255,0.1)')
+              }
             />
           </div>
 
@@ -170,26 +234,45 @@ const handleSubmit = async (e: React.FormEvent) => {
               background: loading
                 ? 'rgba(99,102,241,0.5)'
                 : 'linear-gradient(135deg, #6366f1, #8b5cf6)',
-              color: 'white', border: 'none',
-              borderRadius: '10px', padding: '13px',
-              fontSize: '14px', fontWeight: '600',
+              color: 'white',
+              border: 'none',
+              borderRadius: '10px',
+              padding: '13px',
+              fontSize: '14px',
+              fontWeight: '600',
               cursor: loading ? 'not-allowed' : 'pointer',
               transition: 'opacity 0.2s, transform 0.1s',
               letterSpacing: '0.3px',
             }}
-            onMouseEnter={(e) => { if (!loading) (e.target as HTMLButtonElement).style.opacity = '0.9'; }}
-            onMouseLeave={(e) => { (e.target as HTMLButtonElement).style.opacity = '1'; }}
+            onMouseEnter={(e) => {
+              if (!loading)
+                (e.target as HTMLButtonElement).style.opacity = '0.9';
+            }}
+            onMouseLeave={(e) => {
+              (e.target as HTMLButtonElement).style.opacity = '1';
+            }}
           >
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
-        <p style={{
-          textAlign: 'center', marginTop: '24px',
-          color: 'rgba(255,255,255,0.3)', fontSize: '13px',
-        }}>
+        <p
+          style={{
+            textAlign: 'center',
+            marginTop: '24px',
+            color: 'rgba(255,255,255,0.3)',
+            fontSize: '13px',
+          }}
+        >
           Don't have an account?{' '}
-          <Link to="/register" style={{ color: '#818cf8', textDecoration: 'none', fontWeight: '500' }}>
+          <Link
+            to="/register"
+            style={{
+              color: '#818cf8',
+              textDecoration: 'none',
+              fontWeight: '500',
+            }}
+          >
             Create one
           </Link>
         </p>

@@ -25,15 +25,15 @@
 
 ## Phase 3 – Authentication
 
-* [x] Register endpoint - ZAHRA 
-* [x] Hash password - ZAHRA
-* [x] Login endpoint - ZAHRA
-* [x] JWT generation - ZAHRA
-* [x] Auth middleware - ZAHRA
-* [ ] Protect task routes
-* [x] Unit tests for auth service - ZAHRA
-* [x] Integration tests for auth routes - ZAHRA
-* [x] Add docstrings - ZAHRA
+- [x] Register endpoint - ZAHRA
+- [x] Hash password - ZAHRA
+- [x] Login endpoint - ZAHRA
+- [x] JWT generation - ZAHRA
+- [x] Auth middleware - ZAHRA
+- [ ] Protect task routes
+- [x] Unit tests for auth service - ZAHRA
+- [x] Integration tests for auth routes - ZAHRA
+- [x] Add docstrings - ZAHRA
 
 ---
 
