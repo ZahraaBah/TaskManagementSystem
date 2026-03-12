@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import type { Task } from '../api/tasks';
-import { updateTask, deleteTask } from '../api/tasks';
+import type { Task } from '.././api/tasks';
+import { updateTask, deleteTask } from '.././api/tasks';
 
 interface TaskListProps {
   tasks: Task[];
