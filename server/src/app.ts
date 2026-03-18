@@ -38,10 +38,6 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', environment: process.env.NODE_ENV });
 });
 
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
 app.use(errorHandler);
 
 export default app;

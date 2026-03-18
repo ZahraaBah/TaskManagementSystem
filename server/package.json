@@ -1,7 +1,7 @@
 {
   "name": "task-manager-server",
   "version": "1.0.0",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "test": "vitest run",
     "test:auth": "vitest run src/modules/auth",
@@ -73,7 +73,7 @@
   },
   "test:integration": "vitest run --reporter=verbose src/modules/auth/auth.routes.test.ts",
   "overrides": {
-    "esbuild": "0.25.0",
+    "esbuild": "^0.27.3",
     "tar": "7.5.11"
   }
 }
