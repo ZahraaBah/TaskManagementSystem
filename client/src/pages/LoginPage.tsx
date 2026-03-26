@@ -19,7 +19,7 @@ const LoginPage = () => {
     try {
       const data = await loginApi({ email, password });
       console.log('API response:', data); // ← Vérifie ce que retourne l'API
-      login(data.token, data.user);
+      login(data.accessToken, data.user);  // ← était data.token
       console.log(
         'After login - token in localStorage:',
         localStorage.getItem('auth_token')

@@ -1,5 +1,5 @@
 services:
-  task-manager-postgres:
+  db:
     image: postgres:16-alpine
     container_name: taskmanager_db
     environment:
@@ -10,18 +10,24 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
-  task-manager-server:
+  server:
     build:
       context: ./server
     container_name: taskmanager_server
     depends_on:
-      - task-manager-postgres
-    env_file:
-      - ./server/.env
+      db:
+        condition: service_healthy
     environment:
-      DATABASE_URL: postgresql://postgres:1234@task-manager-postgres:5432/taskmanager
+      DATABASE_URL: postgresql://postgres:1234@db:5432/taskmanager
+      JWT_SECRET: dev_secret_change_in_prod
       PORT: 3000
+      NODE_ENV: development
     ports:
       - "3000:3000"
 

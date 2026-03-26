@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3000/api';
 
 export interface AuthPayload {
   email: string;
@@ -6,7 +6,8 @@ export interface AuthPayload {
 }
 
 export interface AuthResponse {
-  token: string;
+  accessToken: string;   // ← était "token"
+  refreshToken: string;  // ← ajouter
   user: {
     id: string;
     email: string;
