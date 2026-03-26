@@ -27,7 +27,12 @@ const options = {
       },
     },
   },
-  apis: ['./src/modules/**/*.ts'], // Chemins vers tes fichiers avec les annotations
+  apis: [
+  process.env.NODE_ENV === 'production'
+    ? './dist/modules/**/*.js'   // ← prod : fichiers compilés
+    : './src/modules/**/*.ts'    // ← dev : fichiers source
+],
+ 
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

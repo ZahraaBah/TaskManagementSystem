@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react'; // ← Tous les types avec 'import type'
 
 interface Props {

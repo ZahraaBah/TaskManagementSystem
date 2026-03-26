@@ -2,6 +2,8 @@
 
 A full-stack multi-user task management application with authentication, ownership enforcement, and automated tests.
 
+
+
 ---
 
 ## Project Overview

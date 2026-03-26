@@ -32,6 +32,7 @@
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
     "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.31.10",
     "drizzle-orm": "^0.45.1",
     "express": "^4.19.2",
     "express-rate-limit": "^8.3.1",
@@ -43,6 +44,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@babel/parser": "^7.29.2",
     "@eslint/js": "^9.39.1",
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.19",
@@ -51,11 +53,10 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/node": "^20.12.12",
     "@types/pg": "^8.11.6",
+    "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
-    "@types/supertest": "^6.0.3",
     "@vitest/coverage-v8": "^4.0.18",
-    "drizzle-kit": "^0.31.9",
     "esbuild": "^0.27.3",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^9.1.0",
