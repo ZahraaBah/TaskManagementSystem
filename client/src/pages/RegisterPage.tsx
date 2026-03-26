@@ -18,7 +18,7 @@ const RegisterPage = () => {
     setLoading(true);
     try {
       const data = await registerApi({ email, password });
-      login(data.token, data.user);
+      login(data.accessToken, data.user);
       navigate('/tasks');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
