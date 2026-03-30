@@ -1,8 +1,6 @@
 # TaskManagementSystem
 
-A full-stack multi-user task management application with authentication, ownership enforcement, and automated tests.
-
-
+A full-stack multi-user task management application with authentication, ownership enforcement, automated tests, and production-ready deployment with Traefik and Docker.
 
 ---
 
@@ -26,7 +24,7 @@ Users can register, log in, and manage their own tasks. Each user can only acces
 - **ESLint** — Code linting
 - **Prettier** — Code formatting
 - **Vitest + Supertest** — Unit and integration tests
-- **Docker + Docker Compose** — Containerized development environment
+- **Docker + Docker Compose** — Containerized development and production environment
 
 ### Frontend
 
@@ -34,8 +32,15 @@ Users can register, log in, and manage their own tasks. Each user can only acces
 - **Vite** — Build tool
 - **TypeScript** — Type-safe codebase
 - **Tailwind CSS** — Utility-first styling
+- **Nginx** — Production static file server
 - **ESLint** — Code linting
 - **Prettier** — Code formatting
+
+### Infrastructure
+
+- **Traefik** — Reverse proxy with automatic HTTPS via Let's Encrypt
+- **Docker multi-stage builds** — Optimized production images
+- **Docker Compose** — Separate dev and prod configurations
 
 ---
 
@@ -46,20 +51,35 @@ TaskManagementSystem/
 ├── README.md
 ├── PROJECT DESIGN.md
 ├── TASK BREAKDOWN.md
-├── docker-compose.yml
-├── client/                     # React frontend (Vite + Tailwind)
+├── docker-compose.yml           # Development
+├── docker-compose.prod.yml      # Production
+├── traefik/
+│   └── traefik.yml              # Traefik configuration
+├── client/
+│   ├── Dockerfile.prod          # Production build with Nginx
+│   ├── nginx.conf               # Nginx SPA configuration
+│   └── src/
 └── server/
-    ├── Dockerfile
+    ├── Dockerfile               # Multi-stage build
     ├── drizzle.config.ts
     ├── package.json
     ├── tsconfig.json
     ├── .env.example
     └── src/
-        ├── app.ts              # Express app setup
-        ├── server.ts           # Server entry point
+        ├── app.ts
+        ├── server.ts
+        ├── config/
+        │   └── swagger.ts
+        ├── middleware/
+        │   ├── errorHandler.ts
+        │   ├── rateLimiter.ts
+        │   └── sanitize.ts
+        ├── utils/
+        │   ├── logger.ts
+        │   └── validateEnv.ts
         ├── db/
-        │   ├── schema.ts       # Database schema (users + tasks)
-        │   └── index.ts        # Database connection
+        │   ├── schema.ts
+        │   └── index.ts
         └── modules/
             ├── auth/
             │   ├── auth.controller.ts
@@ -85,6 +105,8 @@ TaskManagementSystem/
 
 ## Architecture
 
+### Backend Layers
+
 The backend follows a strict layered architecture:
 
 - **Controllers** → Handle HTTP only (parse request, send response)
@@ -95,50 +117,38 @@ The backend follows a strict layered architecture:
 
 No database calls are made in controllers. No business logic lives in repositories.
 
+### Production Infrastructure
+
+```
+Internet
+   │
+   ▼
+Traefik :443 (HTTPS + Let's Encrypt)
+   ├── api.yourdomain.com  ──► Express (port 3000)
+   └── yourdomain.com      ──► Nginx  (port 80)
+                                  │
+                            internal network
+                                  │
+                             PostgreSQL
+                          (not exposed to internet)
+```
+
 ---
 
-## Code Quality
+## Security
 
-The project uses ESLint for linting and Prettier for code formatting to maintain consistent code style across the codebase.
-
-### Linting and Formatting
-
-#### Backend
-
-```bash
-cd server
-npm run lint          # Check for linting issues
-npm run lint:fix      # Auto-fix linting issues
-npm run format        # Format code with Prettier
-npm run format:check  # Check if code is formatted
-```
-
-#### Frontend
-
-```bash
-cd client
-npm run lint          # Check for linting issues
-npm run lint:fix      # Auto-fix linting issues
-npm run format        # Format code with Prettier
-npm run format:check  # Check if code is formatted
-```
-
-### VS Code Integration
-
-The project includes VS Code workspace settings (`.vscode/settings.json`) that:
-
-- Enable format on save with Prettier as the default formatter
-- Run ESLint auto-fix on save
-- Configure TypeScript import preferences
-- Set up Tailwind CSS and Emmet support
-
-Recommended extensions are listed in `.vscode/extensions.json` and will be suggested when opening the workspace.
+- **JWT** — Stateless authentication on all protected routes
+- **CORS** — Restricted to the frontend domain only
+- **Rate limiting** — Applied on auth and API routes
+- **Input sanitization** — All incoming data is sanitized
+- **Isolated DB network** — PostgreSQL only accessible from the server container
+- **Environment secrets** — Never committed to Git
 
 ---
 
 ## Setup Instructions
 
-### Option A — Docker (Recommended)
+### Option A — Docker Development (Recommended)
 
 #### Prerequisites
 
@@ -150,7 +160,9 @@ cd TaskManagementSystem
 docker compose up --build
 ```
 
-Server runs on `http://localhost:3000`
+- Server: `http://localhost:3000`
+- Frontend: `http://localhost:5173`
+- API docs: `http://localhost:3000/api-docs`
 
 ---
 
@@ -158,7 +170,7 @@ Server runs on `http://localhost:3000`
 
 #### Prerequisites
 
-- Node.js v18+
+- Node.js v20+
 - PostgreSQL v16+
 
 #### 1. Clone the repository
@@ -178,15 +190,17 @@ npm install
 #### 3. Configure environment variables
 
 ```bash
-cp .env.example .env
+cp .env.example .env.development
 ```
 
-Edit `.env` with your values:
+Edit `.env.development`:
 
 ```env
 DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/taskmanager
 JWT_SECRET=your_jwt_secret_here
 PORT=3000
+NODE_ENV=development
+CLIENT_URL=http://localhost:5173
 ```
 
 Generate a secure JWT secret:
@@ -195,67 +209,96 @@ Generate a secure JWT secret:
 node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
-#### 4. Create the database
+#### 4. Create the database and run migrations
 
 ```bash
-psql -U postgres
-CREATE DATABASE taskmanager;
-\q
+psql -U postgres -c "CREATE DATABASE taskmanager;"
+npm run db:migrate
+```
+
+---
+
+## Production Deployment
+
+### Prerequisites
+
+- A VPS with Ubuntu 24.04 (e.g. Hetzner CX22 ~€4/month)
+- A domain name pointing to your VPS IP
+- Docker installed on the VPS
+
+### 1. Configure subdomains
+
+In your DNS provider, add two A records:
+
+| Record | Value |
+|--------|-------|
+| `yourdomain.com` | your VPS IP |
+| `api.yourdomain.com` | your VPS IP |
+
+### 2. Create production environment file
+
+On the VPS, create `.env.production` (never commit this file):
+
+```env
+DB_USER=taskuser
+DB_PASSWORD=your_strong_password
+DB_NAME=taskmanager
+JWT_SECRET=your_32_byte_hex_secret
+CLIENT_URL=https://yourdomain.com
+```
+
+### 3. Update domain names
+
+In `docker-compose.prod.yml`, replace `taskmanager.com` and `api.taskmanager.com` with your real domain.
+
+In `traefik/traefik.yml`, replace `ton-email@example.com` with your real email.
+
+### 4. Deploy
+
+```bash
+# Clone the project
+git clone https://github.com/ZahraaBah/TaskManagementSystem.git
+cd TaskManagementSystem
+
+# Create required files
+docker network create traefik-public
+touch traefik/acme.json && chmod 600 traefik/acme.json
+
+# Start all services
+docker compose -f docker-compose.prod.yml --env-file .env.production up -d --build
+
+# Run database migrations
+docker compose -f docker-compose.prod.yml exec server npm run db:migrate
+```
+
+### 5. Verify deployment
+
+```bash
+curl https://api.yourdomain.com/health
+# → {"status":"ok","environment":"production"}
 ```
 
 ---
 
 ## Environment Variables
 
-| Variable       | Description                       | Example                                                     |
-| -------------- | --------------------------------- | ----------------------------------------------------------- |
-| `DATABASE_URL` | PostgreSQL connection string      | `postgresql://postgres:password@localhost:5432/taskmanager` |
-| `JWT_SECRET`   | Secret key for signing JWT tokens | `a3f9...` (32 byte hex string)                              |
-| `PORT`         | Port the server runs on           | `3000`                                                      |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/taskmanager` |
+| `JWT_SECRET` | Secret key for signing JWT tokens | `a3f9...` (32 byte hex string) |
+| `PORT` | Port the server runs on | `3000` |
+| `NODE_ENV` | Environment | `development` or `production` |
+| `CLIENT_URL` | Frontend URL for CORS | `https://yourdomain.com` |
 
 ---
 
 ## Migration Commands
 
-Generate migration files:
-
 ```bash
 cd server
-npm run db:generate
+npm run db:generate   # Generate migration files
+npm run db:migrate    # Apply migrations
 ```
-
-Apply migrations:
-
-```bash
-npm run db:migrate
-```
-
----
-
-## Running the Server
-
-Development mode (with hot reload):
-
-```bash
-cd server
-npm run dev
-```
-
-Server runs on `http://localhost:3000`
-
-Health check: `GET http://localhost:3000/health`
-
----
-
-## Running the Frontend
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-Frontend runs on `http://localhost:5173`
 
 ---
 
@@ -265,17 +308,12 @@ Frontend runs on `http://localhost:5173`
 
 ```bash
 cd server
-npm run test
+npm run test          # Run all tests
+npm run test:auth     # Auth tests only
+npm run test:tasks    # Tasks tests only
 ```
 
 38 tests across 4 test files (unit + integration).
-
-To check code quality:
-
-```bash
-npm run lint
-npm run format:check
-```
 
 ### Frontend
 
@@ -284,11 +322,18 @@ cd client
 npx vitest run
 ```
 
-6 tests across 2 test files (component tests)
+6 tests across 2 test files (component tests).
 
-To check code quality:
+### Code Quality
 
 ```bash
+# Backend
+cd server
+npm run lint
+npm run format:check
+
+# Frontend
+cd client
 npm run lint
 npm run format:check
 ```
@@ -299,41 +344,46 @@ npm run format:check
 
 ### Auth
 
-| Method | Endpoint         | Auth | Description           | Success |
-| ------ | ---------------- | ---- | --------------------- | ------- |
-| POST   | `/auth/register` | No   | Register a new user   | 201     |
-| POST   | `/auth/login`    | No   | Login and receive JWT | 200     |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| POST | `/api/auth/register` | No | Register a new user | 201 |
+| POST | `/api/auth/login` | No | Login and receive JWT | 200 |
 
 ### Tasks
 
-| Method | Endpoint                | Auth | Description        | Success |
-| ------ | ----------------------- | ---- | ------------------ | ------- |
-| GET    | `/tasks`                | Yes  | Get all user tasks | 200     |
-| GET    | `/tasks?completed=true` | Yes  | Filter by status   | 200     |
-| POST   | `/tasks`                | Yes  | Create a new task  | 201     |
-| PATCH  | `/tasks/:id`            | Yes  | Update a task      | 200     |
-| DELETE | `/tasks/:id`            | Yes  | Delete a task      | 200     |
+| Method | Endpoint | Auth | Description | Status |
+|--------|----------|------|-------------|--------|
+| GET | `/api/tasks` | Yes | Get all user tasks | 200 |
+| GET | `/api/tasks?completed=true` | Yes | Filter by status | 200 |
+| POST | `/api/tasks` | Yes | Create a new task | 201 |
+| PATCH | `/api/tasks/:id` | Yes | Update a task | 200 |
+| DELETE | `/api/tasks/:id` | Yes | Delete a task | 200 |
 
 ### HTTP Status Codes
 
-| Code | Meaning                              |
-| ---- | ------------------------------------ |
-| 200  | Success                              |
-| 201  | Created                              |
-| 400  | Validation error                     |
-| 401  | Not authenticated                    |
-| 403  | Forbidden (not owner)                |
-| 404  | Not found                            |
-| 409  | Conflict (e.g. email already exists) |
-| 500  | Internal server error                |
+| Code | Meaning |
+|------|---------|
+| 200 | Success |
+| 201 | Created |
+| 400 | Validation error |
+| 401 | Not authenticated |
+| 403 | Forbidden (not owner) |
+| 404 | Not found |
+| 409 | Conflict (e.g. email already exists) |
+| 429 | Too many requests |
+| 500 | Internal server error |
 
 ### Authentication Header
 
 All protected routes require:
 
-```plaintext
+```
 Authorization: Bearer <token>
 ```
+
+### API Documentation
+
+Swagger UI is available at `/api-docs` when the server is running.
 
 ---
 
